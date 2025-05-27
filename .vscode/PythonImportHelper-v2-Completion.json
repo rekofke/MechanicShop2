@@ -136,7 +136,16 @@
         "kind": 6,
         "importPath": "app",
         "description": "app",
-        "peekOfCode": "class CustomerSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Customer\ncustomer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():\n    try:",
+        "peekOfCode": "class CustomerSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Customer\ncustomer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)\n# Mechanic Schema\nclass MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "MechanicSchema",
+        "kind": 6,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "class MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# ----- Customer Routes -----\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():",
         "detail": "app",
         "documentation": {}
     },
@@ -181,7 +190,52 @@
         "kind": 2,
         "importPath": "app",
         "description": "app",
-        "peekOfCode": "def delete_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if not customer:\n        return jsonify({\"error\": \"Invalid customer ID\"}), 400\n    db.session.delete(customer)\n    db.session.commit()\n    return jsonify({\"message\": \"Customer deleted successfully\"}), 200\nwith app.app_context():\n    db.drop_all()\n    db.create_all()",
+        "peekOfCode": "def delete_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if not customer:\n        return jsonify({\"error\": \"Invalid customer ID\"}), 400\n    db.session.delete(customer)\n    db.session.commit()\n    return jsonify({\"message\": \"Customer deleted successfully\"}), 200\n# ----- Mechanic Routes -----\n# Create a new mechanic\n@app.route(\"/mechanics\", methods=[\"POST\"])",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "create_mechanic",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def create_mechanic():\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic:  # returns True and access if-block\n        return jsonify({\"error\": \"email already associated with another account\"}), 400\n    new_mechanic = Mechanic(**mechanic_data)",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "get_mechanics",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics)\n# Get a mechanic\n@app.route('/mechanics/<int:mechanic_id>', methods=['GET'])\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "get_mechanic",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200\n    return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n# Update a mechanic\n@app.route('/mechanics/<int:mechanic_id>', methods=['PUT'])\ndef update_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if not mechanic:",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "update_mechanic",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def update_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if not mechanic:\n        return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    # Check if the email already exists for another mechanic\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "delete_mechanic",
+        "kind": 2,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "def delete_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if not mechanic:\n        return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n    db.session.delete(mechanic)\n    db.session.commit()\n    return jsonify({\"message\": \"mechanic deleted successfully\"}), 200\nwith app.app_context():\n    # db.drop_all()\n    db.create_all()",
         "detail": "app",
         "documentation": {}
     },
@@ -235,7 +289,7 @@
         "kind": 5,
         "importPath": "app",
         "description": "app",
-        "peekOfCode": "customer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():\n    try:\n        customer_data = customer_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400",
+        "peekOfCode": "customer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)\n# Mechanic Schema\nclass MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# ----- Customer Routes -----",
         "detail": "app",
         "documentation": {}
     },
@@ -244,7 +298,25 @@
         "kind": 5,
         "importPath": "app",
         "description": "app",
-        "peekOfCode": "customers_schema = CustomerSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():\n    try:\n        customer_data = customer_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Customer).where(Customer.email == customer_data[\"email\"])",
+        "peekOfCode": "customers_schema = CustomerSchema(many=True)\n# Mechanic Schema\nclass MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# ----- Customer Routes -----\n# Create a new customer",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "mechanic_schema",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "mechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# ----- Customer Routes -----\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():\n    try:\n        customer_data = customer_schema.load(request.json)\n    except ValidationError as e:",
+        "detail": "app",
+        "documentation": {}
+    },
+    {
+        "label": "mechanics_schema",
+        "kind": 5,
+        "importPath": "app",
+        "description": "app",
+        "peekOfCode": "mechanics_schema = MechanicSchema(many=True)\n# * ---------- Endpoints/Routes ----------\n# ----- Customer Routes -----\n# Create a new customer\n@app.route(\"/customers\", methods=[\"POST\"])\ndef create_customer():\n    try:\n        customer_data = customer_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400",
         "detail": "app",
         "documentation": {}
     }
