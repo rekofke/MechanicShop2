@@ -4,12 +4,13 @@ from marshmallow import ValidationError
 from app.models import Customer, db
 from .schemas import customer_schema, customers_schema  
 from . import customers_bp
-
+from app.extensions import limiter, cache
 
 
 # ----- Customer Routes -----
 # Create a new customer
 @customers_bp.route("/", methods=["POST"])
+@limiter.limit("25/hour")
 def create_customer():
     try:
         customer_data = customer_schema.load(request.json)
@@ -32,6 +33,8 @@ def create_customer():
 
 # Get all customers
 @customers_bp.route("/", methods=["GET"])
+@limiter.exempt
+@cache.cached(timeout=30)
 def get_customers():
     
     query = select(Customer)
@@ -41,6 +44,7 @@ def get_customers():
 
 # Get a customer
 @customers_bp.route('/<int:customer_id>', methods=['GET'])
+@limiter.exempt
 def get_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -51,6 +55,7 @@ def get_customer(customer_id):
 
 # Update a customer
 @customers_bp.route('/<int:customer_id>', methods=['PUT'])
+@limiter.limit("5/hour")
 def update_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -78,6 +83,7 @@ def update_customer(customer_id):
 
 # Delete a customer
 @customers_bp.route('/<int:customer_id>', methods=['DELETE'])
+@limiter.limit("5/hour")
 def delete_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 

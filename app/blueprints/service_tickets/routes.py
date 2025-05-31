@@ -5,12 +5,14 @@ from .schemas import service_ticket_schema, service_tickets_schema
 from . import service_tickets_bp
 from app.models import ServiceTicket, Customer, db, Mechanic
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
+from app.extensions import limiter
 
 
 
 # ----- Service Ticket Routes -----
 # Create a new service ticket
 @service_tickets_bp.route("/", methods=["POST"])
+@service_tickets_bp.route("/create", methods=["POST"])
 def create_ServiceTicket():
     try:
         service_ticket_data = service_ticket_schema.load(request.json)
@@ -24,23 +26,9 @@ def create_ServiceTicket():
     db.session.commit()
     return service_ticket_schema.jsonify(new_service_ticket), 201  # successfully created
 
-    # if not customer:
-    #     return jsonify({"error": "Invalid customer ID"}), 400
-
-    # query = select(ServiceTicket).where(
-    #     (ServiceTicket.VIN == service_ticket_data["VIN"]) &
-    #     (ServiceTicket.service_date == service_ticket_data["service_date"])
-    # )
-
-    # existing_ticket = db.session.execute(query).scalars().first()
-
-    # if existing_ticket:
-    #     return jsonify({"error": "Service ticket already exists for this VIN on the specified date"}), 400
-
-    return service_ticket_schema.jsonify(new_service_ticket), 201  # successfully created
-
 # Get all service_tickets
 @service_tickets_bp.route("/", methods=["GET"])
+@limiter.exempt
 def get_service_tickets():
     
     query = select(ServiceTicket)
@@ -50,6 +38,7 @@ def get_service_tickets():
 
 # Get a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['GET'])
+@limiter.exempt
 def get_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 
@@ -60,6 +49,7 @@ def get_service_ticket(service_ticket_id):
 
 # Add a mechanic to a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])
+@limiter.limit("25/hour")
 def add_mechanic(service_ticket_id, mechanic_id):
     ticket = db.session.get(ServiceTicket, service_ticket_id)
     mechanic = db.session.get(Mechanic, mechanic_id)
@@ -77,6 +67,7 @@ def add_mechanic(service_ticket_id, mechanic_id):
 
 # Update a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['PUT'])
+@limiter.limit("5/hour")
 def update_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 
@@ -106,6 +97,7 @@ def update_service_ticket(service_ticket_id):
 
 # Delete a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['DELETE'])
+@limiter.limit("5/hour")
 def delete_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 

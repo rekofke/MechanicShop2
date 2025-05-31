@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from .schemas import mechanic_schema, mechanics_schema  
 from . import mechanics_bp
 from app.models import Mechanic, db
+from app.extensions import limiter, cache
 
 
 # ----- Mechanic Routes -----
@@ -30,6 +31,7 @@ def create_mechanic():
 
 # Get all mechanics
 @mechanics_bp.route("/", methods=["GET"])
+@cache.cached(timeout=60)
 def get_mechanics():
     
     query = select(Mechanic)
@@ -39,6 +41,7 @@ def get_mechanics():
 
 # Get a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])
+@limiter.limit("20/hr")
 def get_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
@@ -49,6 +52,7 @@ def get_mechanic(mechanic_id):
 
 # Update a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])
+@limiter.limit("5/hour")
 def update_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
@@ -77,6 +81,7 @@ def update_mechanic(mechanic_id):
 # Delete a mechanic
 # Delete a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['DELETE'])
+@limiter.limit("5/hour")
 def delete_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 

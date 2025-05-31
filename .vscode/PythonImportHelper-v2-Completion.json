@@ -216,7 +216,15 @@
         "documentation": {}
     },
     {
-        "label": "ma",
+        "label": "limiter",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "cache",
         "importPath": "app.extensions",
         "description": "app.extensions",
         "isExtraImport": true,
@@ -225,6 +233,38 @@
     },
     {
         "label": "ma",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "limiter",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "cache",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "ma",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "limiter",
         "importPath": "app.extensions",
         "description": "app.extensions",
         "isExtraImport": true,
@@ -261,6 +301,30 @@
         "description": "flask_marshmallow",
         "isExtraImport": true,
         "detail": "flask_marshmallow",
+        "documentation": {}
+    },
+    {
+        "label": "Limiter",
+        "importPath": "flask_limiter",
+        "description": "flask_limiter",
+        "isExtraImport": true,
+        "detail": "flask_limiter",
+        "documentation": {}
+    },
+    {
+        "label": "get_remote_address",
+        "importPath": "flask_limiter.util",
+        "description": "flask_limiter.util",
+        "isExtraImport": true,
+        "detail": "flask_limiter.util",
+        "documentation": {}
+    },
+    {
+        "label": "Cache",
+        "importPath": "flask_caching",
+        "description": "flask_caching",
+        "isExtraImport": true,
+        "detail": "flask_caching",
         "documentation": {}
     },
     {
@@ -342,7 +406,7 @@
         "kind": 2,
         "importPath": "app.blueprints.customers.routes",
         "description": "app.blueprints.customers.routes",
-        "peekOfCode": "def get_customers():\n    query = select(Customer)\n    customers = db.session.execute(query).scalars().all()\n    return customers_schema.jsonify(customers)\n# Get a customer\n@customers_bp.route('/<int:customer_id>', methods=['GET'])\ndef get_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if customer:\n        return customer_schema.jsonify(customer), 200",
+        "peekOfCode": "def get_customers():\n    query = select(Customer)\n    customers = db.session.execute(query).scalars().all()\n    return customers_schema.jsonify(customers)\n# Get a customer\n@customers_bp.route('/<int:customer_id>', methods=['GET'])\n@limiter.exempt\ndef get_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if customer:",
         "detail": "app.blueprints.customers.routes",
         "documentation": {}
     },
@@ -351,7 +415,7 @@
         "kind": 2,
         "importPath": "app.blueprints.customers.routes",
         "description": "app.blueprints.customers.routes",
-        "peekOfCode": "def get_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if customer:\n        return customer_schema.jsonify(customer), 200\n    return jsonify({\"error\": \"Invalid customer ID\"}), 400\n# Update a customer\n@customers_bp.route('/<int:customer_id>', methods=['PUT'])\ndef update_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if not customer:",
+        "peekOfCode": "def get_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if customer:\n        return customer_schema.jsonify(customer), 200\n    return jsonify({\"error\": \"Invalid customer ID\"}), 400\n# Update a customer\n@customers_bp.route('/<int:customer_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\ndef update_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)",
         "detail": "app.blueprints.customers.routes",
         "documentation": {}
     },
@@ -414,7 +478,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics), 200\n# Get a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200",
+        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics), 200\n# Get a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])\n@limiter.limit(\"20/hr\")\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -423,7 +487,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200\n    return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n# Update a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])\ndef update_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if not mechanic:",
+        "peekOfCode": "def get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200\n    return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n# Update a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\ndef update_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -486,7 +550,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_tickets():\n    query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()\n    return service_tickets_schema.jsonify(service_tickets)\n# Get a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>', methods=['GET'])\ndef get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200",
+        "peekOfCode": "def get_service_tickets():\n    query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()\n    return service_tickets_schema.jsonify(service_tickets)\n# Get a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>', methods=['GET'])\n@limiter.exempt\ndef get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -495,7 +559,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\ndef add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)",
+        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\n@limiter.limit(\"25/hour\")\ndef add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -558,7 +622,25 @@
         "kind": 5,
         "importPath": "app.extensions",
         "description": "app.extensions",
-        "peekOfCode": "ma = Marshmallow()",
+        "peekOfCode": "ma = Marshmallow()\nlimiter = Limiter(\n    get_remote_address,\n    default_limits=['200 per day', '75 per hour'] # Default rate limits\n)\ncache = Cache()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "limiter",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "limiter = Limiter(\n    get_remote_address,\n    default_limits=['200 per day', '75 per hour'] # Default rate limits\n)\ncache = Cache()",
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "cache",
+        "kind": 5,
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "peekOfCode": "cache = Cache()",
         "detail": "app.extensions",
         "documentation": {}
     },
@@ -630,7 +712,7 @@
         "kind": 6,
         "importPath": "config",
         "description": "config",
-        "peekOfCode": "class DevelopmentConfig:\n    SQLALCHEMY_DATABASE_URI = 'sqlite:///mechanic_shop.db'\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    DEBUG = True\nclass TestingConfig:\n    pass\nclass ProductionConfig:\n    pass",
+        "peekOfCode": "class DevelopmentConfig:\n    SQLALCHEMY_DATABASE_URI = 'sqlite:///mechanic_shop.db'\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    DEBUG = True\n    CACHE_TYPE = 'SimpleCache'  \n    CACHE_DEFAULT_TIMEOUT = '300'  # 5 minutes\nclass TestingConfig:\n    pass\nclass ProductionConfig:\n    pass",
         "detail": "config",
         "documentation": {}
     },
