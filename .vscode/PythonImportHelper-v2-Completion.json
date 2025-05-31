@@ -597,7 +597,7 @@
         "kind": 6,
         "importPath": "config",
         "description": "config",
-        "peekOfCode": "class DevelopmentConfig:\n    SQLALCHEMY_DATBASE_URI = 'sqlite:///app.db'\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    DEBUG = True\nclass TestingConfig:\n    pass\nclass ProductionConfig:\n    pass",
+        "peekOfCode": "class DevelopmentConfig:\n    SQLALCHEMY_DATABASE_URI = 'sqlite:///mechanic_shop.db'\n    SQLALCHEMY_TRACK_MODIFICATIONS = False\n    DEBUG = True\nclass TestingConfig:\n    pass\nclass ProductionConfig:\n    pass",
         "detail": "config",
         "documentation": {}
     },
