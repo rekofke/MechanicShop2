@@ -192,6 +192,14 @@
         "documentation": {}
     },
     {
+        "label": "Mechanic",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "ServiceTicket",
         "importPath": "app.models",
         "description": "app.models",
@@ -229,6 +237,22 @@
         "description": "app.extensions",
         "isExtraImport": true,
         "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "mechanic_schema",
+        "importPath": "app.blueprints.mechanics.schemas",
+        "description": "app.blueprints.mechanics.schemas",
+        "isExtraImport": true,
+        "detail": "app.blueprints.mechanics.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "mechanics_schema",
+        "importPath": "app.blueprints.mechanics.schemas",
+        "description": "app.blueprints.mechanics.schemas",
+        "isExtraImport": true,
+        "detail": "app.blueprints.mechanics.schemas",
         "documentation": {}
     },
     {
@@ -381,7 +405,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def create_mechanic():\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic:  # returns True and access if-block\n        return jsonify({\"error\": \"email already associated with another account\"}), 400\n    new_mechanic = Mechanic(**mechanic_data)",
+        "peekOfCode": "def create_mechanic():\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic:\n        return jsonify({\"error\": \"Email already taken\"}), 400\n    new_mechanic = Mechanic(**mechanic_data)",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -390,7 +414,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics)\n# Get a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200",
+        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics), 200\n# Get a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -453,7 +477,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def create_ServiceTicket():\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    customer = db.session.get(Customer, service_ticket_data.get(\"customer_id\"))\n    if not customer:\n        return jsonify({\"error\": \"Invalid customer ID\"}), 400\n    query = select(ServiceTicket).where(\n        (ServiceTicket.VIN == service_ticket_data[\"VIN\"]) &",
+        "peekOfCode": "def create_ServiceTicket():\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    customer = db.session.get(Customer, service_ticket_data['customer_id'])\n    new_service_ticket = ServiceTicket(**service_ticket_data)\n    db.session.add(new_service_ticket)\n    db.session.commit()\n    return service_ticket_schema.jsonify(new_service_ticket), 201  # successfully created",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -471,7 +495,16 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Update a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>', methods=['PUT'])\ndef update_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if not service_ticket:",
+        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\ndef add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)",
+        "detail": "app.blueprints.service_tickets.routes",
+        "documentation": {}
+    },
+    {
+        "label": "add_mechanic",
+        "kind": 2,
+        "importPath": "app.blueprints.service_tickets.routes",
+        "description": "app.blueprints.service_tickets.routes",
+        "peekOfCode": "def add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if ticket and mechanic:\n        if mechanic not in ticket.mechanics:\n            ticket.mechanics.append(mechanic)\n            db.session.commit()\n            return jsonify({\n                'message': f'Successfully added mechanic {mechanic.name} to service ticket {service_ticket_id}',\n                'ticket': service_ticket_schema.dump(ticket),",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },

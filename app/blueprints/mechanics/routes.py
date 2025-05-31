@@ -18,11 +18,11 @@ def create_mechanic():
     query = select(Mechanic).where(Mechanic.email == mechanic_data["email"])
     mechanic = db.session.execute(query).scalars().first()
 
-    if mechanic:  # returns True and access if-block
-        return jsonify({"error": "email already associated with another account"}), 400
+    if mechanic:
+        return jsonify({"error": "Email already taken"}), 400
+    
 
     new_mechanic = Mechanic(**mechanic_data)
-
     db.session.add(new_mechanic)
     db.session.commit()
 
@@ -35,7 +35,7 @@ def get_mechanics():
     query = select(Mechanic)
     mechanics = db.session.execute(query).scalars().all()
 
-    return mechanics_schema.jsonify(mechanics)
+    return mechanics_schema.jsonify(mechanics), 200
 
 # Get a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])

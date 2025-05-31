@@ -19,7 +19,7 @@ service_mechanic = db.Table(
 # * ---------- Models ----------
 class Customer(Base):
     __tablename__ = "customers"
-
+ 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(db.String(255), nullable=False)
     email: Mapped[str] = mapped_column(db.String(320), nullable=False, unique=True)
