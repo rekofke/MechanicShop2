@@ -34,17 +34,25 @@ def create_customer():
 # Get all customers
 @customers_bp.route("/", methods=["GET"])
 @limiter.exempt
-@cache.cached(timeout=30)
 def get_customers():
-    
-    query = select(Customer)
+    try:
+        page = int(request.args.get('page'))
+        per_page = int(request.args.get('per_page'))
+        query = select(Customer)
+        customers = db.paginate(query, page=page, per_page=per_page)
+        return customers_schema.jsonify(customers), 200
+    except:
+        query = select(Customer)
     customers = db.session.execute(query).scalars().all()
 
-    return customers_schema.jsonify(customers)
+    if customers:
+        return customers_schema.jsonify(customers), 200
+    return jsonify({"error": "No customers found"}), 404
 
 # Get a customer
 @customers_bp.route('/<int:customer_id>', methods=['GET'])
 @limiter.exempt
+@cache.cached(timeout=30)
 def get_customer(customer_id):
     customer = db.session.get(Customer, customer_id)
 
@@ -94,3 +102,31 @@ def delete_customer(customer_id):
     db.session.commit()
 
     return jsonify({"message": "Customer deleted successfully"}), 200
+
+# Path query to find most valuable customer
+@customers_bp.route('/most-valuable', methods=['GET'])
+def get_most_valuable():
+    # return list of customers with the most service tickets
+
+    query = select(Customer)
+    customers = db.session.execute(query).scalars().all()
+
+    customers.sort(key=lambda customer: len(customer.tickets),reverse=True)
+
+    return customers_schema.jsonify(customers), 200  
+
+# Query parameter to search customer by email
+@customers_bp.route('/search', methods=['GET'])
+def search_customer():
+    email = request.args.get('email')
+
+    #* search for exact email
+    # query = select(Customer).where(Customer.email == email)
+    #* search for part of email
+    query = select(Customer).where(Customer.email.like(f"%{email}%"))
+    customer = db.session.execute(query).scalars().first()
+
+    return customer_schema.jsonify(customer), 200 
+
+
+

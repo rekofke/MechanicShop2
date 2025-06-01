@@ -1,3 +1,4 @@
+from functools import cache
 from flask import Flask, request, jsonify
 from sqlalchemy import select
 from marshmallow import ValidationError
@@ -5,7 +6,7 @@ from .schemas import service_ticket_schema, service_tickets_schema
 from . import service_tickets_bp
 from app.models import ServiceTicket, Customer, db, Mechanic
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
-from app.extensions import limiter
+from app.extensions import limiter, cache
 from app.util.auth import token_required, admin_required
 
 
@@ -32,15 +33,24 @@ def create_ServiceTicket():
 @service_tickets_bp.route("/", methods=["GET"])
 @limiter.exempt
 def get_service_tickets():
-    
-    query = select(ServiceTicket)
+    try:
+        page = int(request.args.get('page'))
+        per_page = int(request.args.get('per_page'))
+        query = select(ServiceTicket)
+        service_tickets = db.paginate(query, page=page, per_page=per_page)
+        return service_tickets_schema.jsonify(service_tickets), 200
+    except:
+        query = select(ServiceTicket)
     service_tickets = db.session.execute(query).scalars().all()
 
-    return service_tickets_schema.jsonify(service_tickets)
+    if service_tickets:
+        return service_tickets_schema.jsonify(service_tickets), 200
+    return jsonify({"error": "No service_tickets found"}), 404
 
 # Get a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['GET'])
 @limiter.exempt
+@cache.cached(timeout=30)
 def get_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 
@@ -52,6 +62,7 @@ def get_service_ticket(service_ticket_id):
 # Add a mechanic to a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])
 @limiter.limit("25/hour")
+@admin_required
 def add_mechanic(service_ticket_id, mechanic_id):
     ticket = db.session.get(ServiceTicket, service_ticket_id)
     mechanic = db.session.get(Mechanic, mechanic_id)
@@ -70,6 +81,7 @@ def add_mechanic(service_ticket_id, mechanic_id):
 # Update a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['PUT'])
 @limiter.limit("5/hour")
+@admin_required
 def update_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 
@@ -100,6 +112,7 @@ def update_service_ticket(service_ticket_id):
 # Delete a service_ticket
 @service_tickets_bp.route('/<int:service_ticket_id>', methods=['DELETE'])
 @limiter.limit("5/hour")
+@admin_required
 def delete_service_ticket(service_ticket_id):
     service_ticket = db.session.get(ServiceTicket, service_ticket_id)
 

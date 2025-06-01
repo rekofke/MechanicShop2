@@ -288,6 +288,14 @@
         "documentation": {}
     },
     {
+        "label": "cache",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
         "label": "ma",
         "importPath": "app.extensions",
         "description": "app.extensions",
@@ -313,6 +321,14 @@
     },
     {
         "label": "encode_token",
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "isExtraImport": true,
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "token_required",
         "importPath": "app.util.auth",
         "description": "app.util.auth",
         "isExtraImport": true,
@@ -369,6 +385,22 @@
         "documentation": {}
     },
     {
+        "label": "cache",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
+        "label": "wraps",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
+        "documentation": {}
+    },
+    {
         "label": "mechanic_schema",
         "importPath": "app.blueprints.mechanics.schemas",
         "description": "app.blueprints.mechanics.schemas",
@@ -414,14 +446,6 @@
         "description": "datetime",
         "isExtraImport": true,
         "detail": "datetime",
-        "documentation": {}
-    },
-    {
-        "label": "wraps",
-        "importPath": "functools",
-        "description": "functools",
-        "isExtraImport": true,
-        "detail": "functools",
         "documentation": {}
     },
     {
@@ -527,7 +551,7 @@
         "kind": 2,
         "importPath": "app.blueprints.customers.routes",
         "description": "app.blueprints.customers.routes",
-        "peekOfCode": "def get_customers():\n    query = select(Customer)\n    customers = db.session.execute(query).scalars().all()\n    return customers_schema.jsonify(customers)\n# Get a customer\n@customers_bp.route('/<int:customer_id>', methods=['GET'])\n@limiter.exempt\ndef get_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if customer:",
+        "peekOfCode": "def get_customers():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(Customer)\n        customers = db.paginate(query, page=page, per_page=per_page)\n        return customers_schema.jsonify(customers), 200\n    except:\n        query = select(Customer)\n    customers = db.session.execute(query).scalars().all()",
         "detail": "app.blueprints.customers.routes",
         "documentation": {}
     },
@@ -554,7 +578,25 @@
         "kind": 2,
         "importPath": "app.blueprints.customers.routes",
         "description": "app.blueprints.customers.routes",
-        "peekOfCode": "def delete_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if not customer:\n        return jsonify({\"error\": \"Invalid customer ID\"}), 400\n    db.session.delete(customer)\n    db.session.commit()\n    return jsonify({\"message\": \"Customer deleted successfully\"}), 200",
+        "peekOfCode": "def delete_customer(customer_id):\n    customer = db.session.get(Customer, customer_id)\n    if not customer:\n        return jsonify({\"error\": \"Invalid customer ID\"}), 400\n    db.session.delete(customer)\n    db.session.commit()\n    return jsonify({\"message\": \"Customer deleted successfully\"}), 200\n# Path query to find most valuable customer\n@customers_bp.route('/most-valuable', methods=['GET'])\ndef get_most_valuable():",
+        "detail": "app.blueprints.customers.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_most_valuable",
+        "kind": 2,
+        "importPath": "app.blueprints.customers.routes",
+        "description": "app.blueprints.customers.routes",
+        "peekOfCode": "def get_most_valuable():\n    # return list of customers with the most service tickets\n    query = select(Customer)\n    customers = db.session.execute(query).scalars().all()\n    customers.sort(key=lambda customer: len(customer.tickets),reverse=True)\n    return customers_schema.jsonify(customers), 200  \n# Query parameter to search customer by email\n@customers_bp.route('/search', methods=['GET'])\ndef search_customer():\n    email = request.args.get('email')",
+        "detail": "app.blueprints.customers.routes",
+        "documentation": {}
+    },
+    {
+        "label": "search_customer",
+        "kind": 2,
+        "importPath": "app.blueprints.customers.routes",
+        "description": "app.blueprints.customers.routes",
+        "peekOfCode": "def search_customer():\n    email = request.args.get('email')\n    #* search for exact email\n    # query = select(Customer).where(Customer.email == email)\n    #* search for part of email\n    query = select(Customer).where(Customer.email.like(f\"%{email}%\"))\n    customer = db.session.execute(query).scalars().first()\n    return customer_schema.jsonify(customer), 200",
         "detail": "app.blueprints.customers.routes",
         "documentation": {}
     },
@@ -563,7 +605,7 @@
         "kind": 6,
         "importPath": "app.blueprints.customers.schemas",
         "description": "app.blueprints.customers.schemas",
-        "peekOfCode": "class CustomerSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Customer\ncustomer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)",
+        "peekOfCode": "class CustomerSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Customer\n        include_relationships = True\ncustomer_schema = CustomerSchema()\ncustomers_schema = CustomerSchema(many=True)",
         "detail": "app.blueprints.customers.schemas",
         "documentation": {}
     },
@@ -608,7 +650,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def get_mechanics():\n    query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()\n    return mechanics_schema.jsonify(mechanics), 200\n# Get a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])\n@limiter.limit(\"20/hr\")\ndef get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:",
+        "peekOfCode": "def get_mechanics():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(Mechanic)\n        mechanics = db.paginate(query, page=page, per_page=per_page)\n        return mechanics_schema.jsonify(mechanics), 200\n    except:\n        query = select(Mechanic)\n    mechanics = db.session.execute(query).scalars().all()",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -617,7 +659,7 @@
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200\n    return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n# Update a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\ndef update_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)",
+        "peekOfCode": "def get_mechanic(mechanic_id):\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if mechanic:\n        return mechanic_schema.jsonify(mechanic), 200\n    return jsonify({\"error\": \"Invalid mechanic ID\"}), 400\n# Update a mechanic\n@mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\n@token_required\ndef update_mechanic(mechanic_id):",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -644,7 +686,7 @@
         "kind": 6,
         "importPath": "app.blueprints.mechanics.schemas",
         "description": "app.blueprints.mechanics.schemas",
-        "peekOfCode": "class MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\nlogin_schema = MechanicSchema(exclude=['name', 'salary'])",
+        "peekOfCode": "class MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\n        include_relationships = True\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\nlogin_schema = MechanicSchema(exclude=['name', 'salary'])",
         "detail": "app.blueprints.mechanics.schemas",
         "documentation": {}
     },
@@ -689,7 +731,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_tickets():\n    query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()\n    return service_tickets_schema.jsonify(service_tickets)\n# Get a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>', methods=['GET'])\n@limiter.exempt\ndef get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:",
+        "peekOfCode": "def get_service_tickets():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(ServiceTicket)\n        service_tickets = db.paginate(query, page=page, per_page=per_page)\n        return service_tickets_schema.jsonify(service_tickets), 200\n    except:\n        query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -698,7 +740,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\n@limiter.limit(\"25/hour\")\ndef add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)",
+        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\n@limiter.limit(\"25/hour\")\n@admin_required\ndef add_mechanic(service_ticket_id, mechanic_id):",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },

@@ -8,11 +8,13 @@ from app.extensions import limiter, cache
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.util.auth import encode_token
 from jose import jwt
+from app.util.auth import token_required
 
 
 # ----- Mechanic Routes -----
 # Login Route
 @mechanics_bp.route("/login", methods=['POST'])
+@token_required
 def login_mechanic():
     try:
         creds = login_schema.load(request.json)
@@ -59,17 +61,25 @@ def create_mechanic():
 
 # Get all mechanics
 @mechanics_bp.route("/", methods=["GET"])
-@cache.cached(timeout=60)
 def get_mechanics():
-    
-    query = select(Mechanic)
+    try:
+        page = int(request.args.get('page'))
+        per_page = int(request.args.get('per_page'))
+        query = select(Mechanic)
+        mechanics = db.paginate(query, page=page, per_page=per_page)
+        return mechanics_schema.jsonify(mechanics), 200
+    except:
+        query = select(Mechanic)
     mechanics = db.session.execute(query).scalars().all()
 
-    return mechanics_schema.jsonify(mechanics), 200
+    if mechanics:
+        return mechanics_schema.jsonify(mechanics), 200
+    return jsonify({"error": "No mechanics found"}), 404
 
 # Get a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['GET'])
 @limiter.limit("20/hr")
+@cache.cached(timeout=60)
 def get_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
@@ -81,6 +91,7 @@ def get_mechanic(mechanic_id):
 # Update a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['PUT'])
 @limiter.limit("5/hour")
+@token_required
 def update_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
@@ -112,6 +123,7 @@ def update_mechanic(mechanic_id):
 # Delete a mechanic
 @mechanics_bp.route('/<int:mechanic_id>', methods=['DELETE'])
 @limiter.limit("5/hour")
+@token_required
 def delete_mechanic(mechanic_id):
     mechanic = db.session.get(Mechanic, mechanic_id)
 
