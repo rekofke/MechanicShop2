@@ -29,11 +29,12 @@ mysql-connector==2.2.9
 mysql-connector-python==9.3.0
 ordered-set==4.1.0
 packaging==25.0
-pyasn1==0.4.8
+pyasn1==0.6.1
 pycparser==2.22
 Pygments==2.19.1
 PyJWT==2.10.1
 PyMySQL==1.1.1
+python-jose==3.5.0
 PyYAML==6.0.2
 rich==13.9.4
 rsa==4.9.1

@@ -1,13 +1,40 @@
 from flask import Flask, request, jsonify
 from sqlalchemy import select
 from marshmallow import ValidationError
-from .schemas import mechanic_schema, mechanics_schema  
+from .schemas import mechanic_schema, mechanics_schema, login_schema
 from . import mechanics_bp
 from app.models import Mechanic, db
 from app.extensions import limiter, cache
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.util.auth import encode_token
+from jose import jwt
 
 
 # ----- Mechanic Routes -----
+# Login Route
+@mechanics_bp.route("/login", methods=['POST'])
+def login_mechanic():
+    try:
+        creds = login_schema.load(request.json)
+    except ValidationError as e:
+        return jsonify(e.messages), 400
+    
+    query = select(Mechanic).where(Mechanic.email == creds["email"])
+    mechanic = db.session.execute(query).scalars().first()
+
+    if mechanic and check_password_hash(mechanic.password, creds["password"]):
+        # grant  and return a token
+        token = encode_token(mechanic.id, role='mechanic')
+        return jsonify({
+            "message": "Successfully logged in",
+            "token": token,
+            "user": mechanic_schema.dump(mechanic)
+        })
+    
+    return jsonify({"error": "Invalid email or password"}), 401
+
+#$ CREATE a password hash
+
 # Create a new mechanic
 @mechanics_bp.route("/", methods=["POST"])
 def create_mechanic():
@@ -22,6 +49,7 @@ def create_mechanic():
     if mechanic:
         return jsonify({"error": "Email already taken"}), 400
     
+    mechanic_data['password'] = generate_password_hash(mechanic_data['password'])
 
     new_mechanic = Mechanic(**mechanic_data)
     db.session.add(new_mechanic)
@@ -74,6 +102,8 @@ def update_mechanic(mechanic_id):
     
     for fields, value in mechanic_data.items():
         setattr(mechanic, fields, value)
+    
+    mechanic_data['password'] = generate_password_hash(mechanic_data['password'])
 
     db.session.commit()
     return mechanic_schema.jsonify(mechanic), 200

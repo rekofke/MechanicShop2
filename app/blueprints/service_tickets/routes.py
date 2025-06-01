@@ -6,13 +6,15 @@ from . import service_tickets_bp
 from app.models import ServiceTicket, Customer, db, Mechanic
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 from app.extensions import limiter
+from app.util.auth import token_required, admin_required
 
 
 
 # ----- Service Ticket Routes -----
 # Create a new service ticket
 @service_tickets_bp.route("/", methods=["POST"])
-@service_tickets_bp.route("/create", methods=["POST"])
+@limiter.limit("25/hour")
+@admin_required
 def create_ServiceTicket():
     try:
         service_ticket_data = service_ticket_schema.load(request.json)

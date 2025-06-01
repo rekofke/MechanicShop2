@@ -72,6 +72,22 @@
         "documentation": {}
     },
     {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "select",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -277,6 +293,79 @@
         "description": "app.extensions",
         "isExtraImport": true,
         "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "generate_password_hash",
+        "importPath": "werkzeug.security",
+        "description": "werkzeug.security",
+        "isExtraImport": true,
+        "detail": "werkzeug.security",
+        "documentation": {}
+    },
+    {
+        "label": "check_password_hash",
+        "importPath": "werkzeug.security",
+        "description": "werkzeug.security",
+        "isExtraImport": true,
+        "detail": "werkzeug.security",
+        "documentation": {}
+    },
+    {
+        "label": "encode_token",
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "isExtraImport": true,
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "token_required",
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "isExtraImport": true,
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "admin_required",
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "isExtraImport": true,
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "jose",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "jose",
+        "description": "jose",
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "jwt",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "JWTError",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "jwt",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
         "documentation": {}
     },
     {
@@ -293,6 +382,46 @@
         "description": "app.blueprints.mechanics.schemas",
         "isExtraImport": true,
         "detail": "app.blueprints.mechanics.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timedelta",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "timezone",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "date",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "wraps",
+        "importPath": "functools",
+        "description": "functools",
+        "isExtraImport": true,
+        "detail": "functools",
         "documentation": {}
     },
     {
@@ -357,14 +486,6 @@
         "description": "sqlalchemy.orm",
         "isExtraImport": true,
         "detail": "sqlalchemy.orm",
-        "documentation": {}
-    },
-    {
-        "label": "date",
-        "importPath": "datetime",
-        "description": "datetime",
-        "isExtraImport": true,
-        "detail": "datetime",
         "documentation": {}
     },
     {
@@ -465,11 +586,20 @@
         "documentation": {}
     },
     {
+        "label": "login_mechanic",
+        "kind": 2,
+        "importPath": "app.blueprints.mechanics.routes",
+        "description": "app.blueprints.mechanics.routes",
+        "peekOfCode": "def login_mechanic():\n    try:\n        creds = login_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == creds[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic and check_password_hash(mechanic.password, creds[\"password\"]):\n        # grant  and return a token\n        token = encode_token(mechanic.id, role='mechanic')",
+        "detail": "app.blueprints.mechanics.routes",
+        "documentation": {}
+    },
+    {
         "label": "create_mechanic",
         "kind": 2,
         "importPath": "app.blueprints.mechanics.routes",
         "description": "app.blueprints.mechanics.routes",
-        "peekOfCode": "def create_mechanic():\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic:\n        return jsonify({\"error\": \"Email already taken\"}), 400\n    new_mechanic = Mechanic(**mechanic_data)",
+        "peekOfCode": "def create_mechanic():\n    try:\n        mechanic_data = mechanic_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(Mechanic).where(Mechanic.email == mechanic_data[\"email\"])\n    mechanic = db.session.execute(query).scalars().first()\n    if mechanic:\n        return jsonify({\"error\": \"Email already taken\"}), 400\n    mechanic_data['password'] = generate_password_hash(mechanic_data['password'])",
         "detail": "app.blueprints.mechanics.routes",
         "documentation": {}
     },
@@ -514,7 +644,7 @@
         "kind": 6,
         "importPath": "app.blueprints.mechanics.schemas",
         "description": "app.blueprints.mechanics.schemas",
-        "peekOfCode": "class MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)",
+        "peekOfCode": "class MechanicSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = Mechanic\nmechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\nlogin_schema = MechanicSchema(exclude=['name', 'salary'])",
         "detail": "app.blueprints.mechanics.schemas",
         "documentation": {}
     },
@@ -523,7 +653,7 @@
         "kind": 5,
         "importPath": "app.blueprints.mechanics.schemas",
         "description": "app.blueprints.mechanics.schemas",
-        "peekOfCode": "mechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)",
+        "peekOfCode": "mechanic_schema = MechanicSchema()\nmechanics_schema = MechanicSchema(many=True)\nlogin_schema = MechanicSchema(exclude=['name', 'salary'])",
         "detail": "app.blueprints.mechanics.schemas",
         "documentation": {}
     },
@@ -532,7 +662,16 @@
         "kind": 5,
         "importPath": "app.blueprints.mechanics.schemas",
         "description": "app.blueprints.mechanics.schemas",
-        "peekOfCode": "mechanics_schema = MechanicSchema(many=True)",
+        "peekOfCode": "mechanics_schema = MechanicSchema(many=True)\nlogin_schema = MechanicSchema(exclude=['name', 'salary'])",
+        "detail": "app.blueprints.mechanics.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "login_schema",
+        "kind": 5,
+        "importPath": "app.blueprints.mechanics.schemas",
+        "description": "app.blueprints.mechanics.schemas",
+        "peekOfCode": "login_schema = MechanicSchema(exclude=['name', 'salary'])",
         "detail": "app.blueprints.mechanics.schemas",
         "documentation": {}
     },
@@ -618,6 +757,42 @@
         "documentation": {}
     },
     {
+        "label": "encode_token",
+        "kind": 2,
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "peekOfCode": "def encode_token(user_id, role='user'):\n    payload = {\n        'exp': datetime.now(timezone.utc) + timedelta(days=1), # expiration time set to 1 day\n        'iat': datetime.now(timezone.utc), # issuad at time\n        'sub': str(user_id), #* user_id must be string in order to decode properly\n        'role': role  #* role can be 'user' or 'mechanic'\n    }\n    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')\n    return token\ndef token_required(f):",
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "token_required",
+        "kind": 2,
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "peekOfCode": "def token_required(f):\n    @wraps(f)\n    def decorated(*args, **kwargs):\n        token = None\n        # Check if token is passed in the headers\n        if 'Authorization' in request.headers:\n            # headers dictionary in rewuests, authorization key\n            token = request.headers['Authorization'].split()[1]\n        if not token:\n            return jsonify({'error': 'Token is missing!'}), 401",
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "admin_required",
+        "kind": 2,
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "peekOfCode": "def admin_required(f):\n    @wraps(f)\n    def decorated(*args, **kwargs):\n        token = None\n        # Check if token is passed in the headers\n        if 'Authorization' in request.headers:\n            # headers dictionary in rewuests, authorization key\n            token = request.headers['Authorization'].split()[1]\n        if not token:\n            return jsonify({'error': 'Token is missing!'}), 401",
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
+        "label": "SECRET_KEY",
+        "kind": 5,
+        "importPath": "app.util.auth",
+        "description": "app.util.auth",
+        "peekOfCode": "SECRET_KEY = \"super secret secrets\"\ndef encode_token(user_id, role='user'):\n    payload = {\n        'exp': datetime.now(timezone.utc) + timedelta(days=1), # expiration time set to 1 day\n        'iat': datetime.now(timezone.utc), # issuad at time\n        'sub': str(user_id), #* user_id must be string in order to decode properly\n        'role': role  #* role can be 'user' or 'mechanic'\n    }\n    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')\n    return token",
+        "detail": "app.util.auth",
+        "documentation": {}
+    },
+    {
         "label": "ma",
         "kind": 5,
         "importPath": "app.extensions",
@@ -667,7 +842,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class Mechanic(Base):\n    __tablename__ = \"mechanics\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    name: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    email: Mapped[str] = mapped_column(db.String(320), nullable=False, unique=True)\n    salary: Mapped[float] = mapped_column(db.Float(), nullable=False)\n    tickets: Mapped[List[\"ServiceTicket\"]] = db.relationship(secondary=service_mechanic, back_populates=\"mechanics\")\nclass ServiceTicket(Base):\n    __tablename__ = \"service_tickets\"\n    id: Mapped[int] = mapped_column(primary_key=True)",
+        "peekOfCode": "class Mechanic(Base):\n    __tablename__ = \"mechanics\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    name: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    email: Mapped[str] = mapped_column(db.String(320), nullable=False, unique=True)\n    salary: Mapped[float] = mapped_column(db.Float(), nullable=False)\n    password: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    tickets: Mapped[List[\"ServiceTicket\"]] = db.relationship(secondary=service_mechanic, back_populates=\"mechanics\")\nclass ServiceTicket(Base):\n    __tablename__ = \"service_tickets\"",
         "detail": "app.models",
         "documentation": {}
     },
