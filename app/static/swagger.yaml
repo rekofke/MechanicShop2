@@ -1,0 +1,201 @@
+swagger: '2.0'
+info:
+  title: "Mechanic Shop API"
+  description: "This is documentation for a Mechanic Shop API customer tracking system."
+  version: "1.0.0"
+host: "127.0.0.1:5000"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+securityDefinitions:
+  bearerAuth:
+    type: "apiKey"
+    name: "Authorization"
+    in: "header"
+paths:
+  /mechanics/login:
+    post:
+      tags:
+        - "Mechanics"
+      summary: "Login a mechanic (generate a token)"
+      description: "Post login credentials including email and password, and receive a token if successful"
+      parameters:
+        - in: body
+          name: body
+          description: "Login credentials for the mechanic"
+          required: true
+          schema: 
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+            
+      responses:
+        201:
+          description: "Mechanic created successfully"
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+          examples:
+            application/json:
+              token: "eyJhbGciOiJIUzI1NiIsI..."
+
+  /mechanics:
+    post:
+      tags:
+        - "Mechanics"
+      summary: "Create a new mechanic"
+      description: "Send JSON payload including mechanic details to create a new mechanic in database"
+      parameters:
+        - in: body
+          name: body
+          description: "Information of mechanic to be created"
+          required: true
+          schema: 
+            $ref: "#/definitions/MechanicPayload" 
+      responses:
+        201:
+          description: "Mechanic created successfully"
+          schema:
+            $ref: "#/definitions/MechanicResponse" 
+          examples:  
+            application/json:
+              email: "test@test.com"
+              id: 1
+              name: "Test Testly"
+              password: "pass"
+              salary: 50000
+              tickets: []
+
+    get:
+        tags:
+          - "Mechanics"
+        summary: "Get all mechanics"
+        description: "Endpoint to return all mechanics"
+        responses:
+          200:
+            description: "Successfully retrieved mechanics"
+            schema:
+              $ref: "#/definitions/MechanicListResponse"
+
+  /mechanics/{mechanic_id}:
+    get:
+      tags:
+        - "Mechanics"
+      summary: "Get a mechanic by ID"
+      parameters:
+        - in: path
+          name: mechanic_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/MechanicResponse"
+
+    put:
+      tags:
+        - "Mechanics"
+      summary: "Update a mechanic (requires authentication)"
+      description: "Update an existing mechanic's information requires mechanic to be logged in"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: mechanic_id
+          type: integer
+          required: true
+          description: "ID of the mechanic to update"
+        - in: body
+          name: body
+          description: "Information used update a mechanic"
+          required: true
+          schema: 
+            $ref: "#/definitions/MechanicPayload" 
+      responses:
+        200:  # Changed from 201 to 200 (standard for updates)
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/MechanicResponse"
+
+    delete:
+      tags: 
+        - "Mechanics"
+      summary: "Delete a mechanic (requires authentication)"
+      description: "Delete a mechanic from the database requires mechanic to be logged in"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: mechanic_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Mechanic deleted successfully"
+    
+          
+
+definitions:
+  
+  MechanicPayload:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      salary:
+        type: integer
+
+  MechanicResponse:
+    type: object
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      salary:
+        type: integer
+      tickets:  
+        type: array
+        items:
+          type: integer
+
+  MechanicListResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        password:
+          type: string
+        salary:
+          type: integer
+        tickets:  
+          type: array
+          items:
+            type: integer
+
+
+
+  

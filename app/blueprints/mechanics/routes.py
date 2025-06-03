@@ -14,7 +14,6 @@ from app.util.auth import token_required
 # ----- Mechanic Routes -----
 # Login Route
 @mechanics_bp.route("/login", methods=['POST'])
-@token_required
 def login_mechanic():
     try:
         creds = login_schema.load(request.json)
