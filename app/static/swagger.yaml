@@ -16,6 +16,7 @@ securityDefinitions:
     name: "Authorization"
     in: "header"
 paths:
+#* Mechanics Paths
   /mechanics/login:
     post:
       tags:
@@ -121,7 +122,7 @@ paths:
           schema: 
             $ref: "#/definitions/MechanicPayload" 
       responses:
-        200:  # Changed from 201 to 200 (standard for updates)
+        200: 
           description: "Successful Update"
           schema:
             $ref: "#/definitions/MechanicResponse"
@@ -142,10 +143,102 @@ paths:
         200:
           description: "Mechanic deleted successfully"
     
-          
+#* Customers paths
+  /customers:
+    post:
+      tags:
+        - "Customers"
+      summary: "Create a new Customer"
+      description: "Send JSON payload including customer details to create a new customer in database"
+      parameters:
+        - in: body
+          name: body
+          description: "Information of customer to be created"
+          required: true
+          schema: 
+            $ref: "#/definitions/CustomerPayload" 
+      responses:
+        201:
+          description: "Customer created successfully"
+          schema:
+            $ref: "#/definitions/CustomerResponse" 
+          examples:  
+            application/json:
+              email: "test@testing.com"
+              id: 1
+              name: "Test Customer"
+              phone: "123-456-7890"
+              tickets: []
+    get:
+      tags:
+          - "Customers"
+      summary: "Get all customers"
+      description: "Endpoint to return all customers"
+      responses:
+        200:
+          description: "Successfully retrieved customers"
+          schema:
+            $ref: "#/definitions/CustomerListResponse"    
+  /customers/{customer_id}:
+    get:
+      tags:
+        - "Customers"
+      summary: "Get a customer by ID"
+      parameters:
+        - in: path
+          name: customer_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/CustomerResponse"
+
+    put:
+      tags:
+        - "Customers"
+      summary: "Update a customer (requires authentication)"
+      description: "Update an existing customer's information requires mechanic to be logged in"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customer_id
+          type: integer
+          required: true
+          description: "ID of the customer to update"
+        - in: body
+          name: body
+          description: "Information used update a customer"
+          required: true
+          schema: 
+            $ref: "#/definitions/CustomerPayload" 
+      responses:
+        200:  
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/CustomerResponse"
+
+    delete:
+      tags: 
+        - "Customers"
+      summary: "Delete a customer (requires authentication)"
+      description: "Delete a customer from the database requires mechanic to be logged in"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customer_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Customer deleted successfully"
 
 definitions:
-  
+#* Mechanics definitions
+
   MechanicPayload:
     type: object
     properties:
@@ -196,6 +289,47 @@ definitions:
           items:
             type: integer
 
+#* Customers definitions
+  CustomerPayload:
+    type: object
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
 
+  CustomerResponse:
+    type: object
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      phone:
+        type: string
+      tickets:
+        type: array
+        items:
+          type: integer
 
-  
+  CustomerListResponse:
+    type: array
+    items:
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        tickets:  
+          type: array
+          items:
+            type: integer
