@@ -16,7 +16,7 @@ securityDefinitions:
     name: "Authorization"
     in: "header"
 paths:
-#* Mechanics Paths
+  #* Mechanics Paths
   /mechanics/login:
     post:
       tags:
@@ -35,10 +35,9 @@ paths:
                 type: string
               password:
                 type: string
-            
       responses:
-        201:
-          description: "Mechanic created successfully"
+        200:  # Changed from 201 to 200
+          description: "Login successful"
           schema:
             type: object
             properties:
@@ -143,7 +142,7 @@ paths:
         200:
           description: "Mechanic deleted successfully"
     
-#* Customers paths
+  #* Customers paths
   /customers:
     post:
       tags:
@@ -236,9 +235,103 @@ paths:
         200:
           description: "Customer deleted successfully"
 
-definitions:
-#* Mechanics definitions
+  #* Service Ticket paths
+  /service-tickets:
+    post:
+      tags:
+        - "Service Tickets"
+      summary: "Create a new service_tickets"
+      description: "Send JSON payload including service ticket details to create a new service_tickets in database"
+      parameters:
+        - in: body
+          name: body
+          description: "Information of service ticket to be created"
+          required: true
+          schema: 
+            $ref: "#/definitions/ServiceTicketPayload" 
+      responses:
+        201:
+          description: "Service Ticket created successfully"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse" 
+          examples:  
+            application/json:
+              VIN: "1HGCM82633A123456"
+              customer_id: 1
+              id: 2
+              service_date: "2023-10-01"
+              service_desc: "Oil Change"
 
+    get:
+      tags:
+        - "Service Tickets"
+      summary: "Get all service tickets"
+      description: "Endpoint to return all service tickets"
+      responses:
+        200:
+          description: "Successfully retrieved service tickets"
+          schema:
+            $ref: "#/definitions/ServiceTicketListResponse"
+
+  /service-tickets/{service_ticket_id}:
+    get:
+      tags:
+        - "Service Tickets"
+      summary: "Get a service ticket by ID"
+      parameters:
+        - in: path
+          name: service_ticket_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+
+    put:
+      tags:
+        - "Service Tickets"
+      summary: "Update a service ticket (requires authentication)"
+      description: "Update an existing service ticket's information requires service ticket to be logged in"
+      security:  # Fixed typo (was "security: inf")
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  # Fixed parameter name (no space)
+          type: integer
+          required: true
+          description: "ID of the service ticket to update"
+        - in: body
+          name: body
+          description: "Information used update a service ticket"
+          required: true
+          schema: 
+            $ref: "#/definitions/ServiceTicketPayload" 
+      responses:
+        200: 
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+
+    delete:
+      tags: 
+        - "Service Tickets"
+      summary: "Delete a service ticket (requires authentication)"
+      description: "Delete a service ticket from the database requires service ticket to be logged in"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  # Fixed parameter name (no space)
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Service ticket deleted successfully"
+              
+definitions:
+  #* Mechanics definitions
   MechanicPayload:
     type: object
     properties:
@@ -289,7 +382,7 @@ definitions:
           items:
             type: integer
 
-#* Customers definitions
+  #* Customers definitions
   CustomerPayload:
     type: object
     properties:
@@ -333,3 +426,35 @@ definitions:
           type: array
           items:
             type: integer
+
+  #* Service Ticket definitions
+  ServiceTicketPayload:
+    type: object
+    properties:
+      service_date:
+        type: string
+      VIN:
+        type: string
+      service_desc:
+        type: string
+      customer_id:
+        type: integer
+
+  ServiceTicketResponse:
+    type: object
+    properties:
+      VIN:
+        type: string
+      customer_id:
+        type: integer
+      id:
+        type: integer
+      service_date:
+        type: string
+      service_desc:
+        type: string
+
+  ServiceTicketListResponse:
+    type: array
+    items:
+      $ref: "#/definitions/ServiceTicketResponse" 

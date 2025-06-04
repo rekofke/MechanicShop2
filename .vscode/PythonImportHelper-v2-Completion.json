@@ -875,7 +875,7 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class Customer(Base):\n    __tablename__ = \"customers\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    name: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    email: Mapped[str] = mapped_column(db.String(320), nullable=False, unique=True)\n    phone: Mapped[str] = mapped_column(db.String(16), nullable=False)\n    tickets: Mapped[List[\"ServiceTicket\"]] = db.relationship(back_populates=\"customer\")\nclass Mechanic(Base):\n    __tablename__ = \"mechanics\"\n    id: Mapped[int] = mapped_column(primary_key=True)",
+        "peekOfCode": "class Customer(Base):\n    __tablename__ = \"customers\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    name: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    email: Mapped[str] = mapped_column(db.String(320), nullable=False, unique=True)\n    phone: Mapped[str] = mapped_column(db.String(16), nullable=False)\n    tickets: Mapped[List[\"ServiceTicket\"]] = db.relationship(back_populates=\"customer\", cascade=\"all, delete-orphan\", passive_deletes=True)\nclass Mechanic(Base):\n    __tablename__ = \"mechanics\"\n    id: Mapped[int] = mapped_column(primary_key=True)",
         "detail": "app.models",
         "documentation": {}
     },
