@@ -96,6 +96,30 @@
         "documentation": {}
     },
     {
+        "label": "Flask",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "request",
         "importPath": "flask",
         "description": "flask",
@@ -144,6 +168,22 @@
         "documentation": {}
     },
     {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "importPath": "marshmallow",
+        "description": "marshmallow",
+        "isExtraImport": true,
+        "detail": "marshmallow",
+        "documentation": {}
+    },
+    {
         "label": "ValidationError",
         "importPath": "marshmallow",
         "description": "marshmallow",
@@ -248,6 +288,30 @@
         "documentation": {}
     },
     {
+        "label": "db",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SerializedPart",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SerializedPart",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "ServiceTicket",
         "importPath": "app.models",
         "description": "app.models",
@@ -293,6 +357,30 @@
         "description": "app.models",
         "isExtraImport": true,
         "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "limiter",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "cache",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "ma",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
         "documentation": {}
     },
     {
@@ -893,6 +981,87 @@
         "description": "app.blueprints.part_descriptions.schemas",
         "peekOfCode": "part_descriptions_schema = PartDescriptionSchema(many=True)",
         "detail": "app.blueprints.part_descriptions.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "create_serialized_part",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def create_serialized_part():\n    try:\n        serialized_part_data = serialized_part_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    new_serialized_part = SerializedPart(**serialized_part_data)\n    db.session.add(new_serialized_part)\n    db.session.commit()\n    return jsonify({\n        \"message\": f\"Added new {new_serialized_part.description.brand} {new_serialized_part.description.part_name} to database\",",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_serialized_parts",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def get_serialized_parts():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(SerializedPart)\n        serialized_parts = db.paginate(query, page=page, per_page=per_page)\n        return serialized_parts_schema.jsonify(serialized_parts), 200\n    except:\n        query = select(SerializedPart)\n    serialized_parts = db.session.execute(query).scalars().all()",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_serialized_part",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def get_serialized_part(serialized_part_id):\n    serialized_part = db.session.get(SerializedPart, serialized_part_id)\n    if serialized_part:\n        return serialized_part_schema.jsonify(serialized_part), 200\n    return jsonify({\"error\": \"Invalid serialized_part ID\"}), 400\n# Update a serialized_part\n@serialized_parts_bp.route('/<int:serialized_part_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\ndef update_serialized_part(serialized_part_id):\n    serialized_part = db.session.get(SerializedPart, serialized_part_id)",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "update_serialized_part",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def update_serialized_part(serialized_part_id):\n    serialized_part = db.session.get(SerializedPart, serialized_part_id)\n    if not serialized_part:\n        return jsonify({\"error\": \"Invalid serialized_part ID\"}), 400\n    try:\n        serialized_part_data = serialized_part_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    for fields, value in serialized_part_data.items():\n        setattr(serialized_part, fields, value)",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "delete_serialized_part",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def delete_serialized_part(serialized_part_id):\n    serialized_part = db.session.get(SerializedPart, serialized_part_id)\n    if not serialized_part:\n        return jsonify({\"error\": \"Invalid serialized_part ID\"}), 400\n    db.session.delete(serialized_part)\n    db.session.commit()\n    return jsonify({\"message\": \"serialized_part deleted successfully\"}), 200\n# Path query to find most valuable serialized_part\n@serialized_parts_bp.route('/most-valuable', methods=['GET'])\ndef get_most_valuable():",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_most_valuable",
+        "kind": 2,
+        "importPath": "app.blueprints.serialized_parts.routes",
+        "description": "app.blueprints.serialized_parts.routes",
+        "peekOfCode": "def get_most_valuable():\n    # return list of serialized_parts with the most service tickets\n    query = select(SerializedPart)\n    serialized_parts = db.session.execute(query).scalars().all()\n    serialized_parts.sort(key=lambda serialized_part: len(serialized_part.tickets),reverse=True)\n    return serialized_parts_schema.jsonify(serialized_parts), 200",
+        "detail": "app.blueprints.serialized_parts.routes",
+        "documentation": {}
+    },
+    {
+        "label": "SerializedPartSchema",
+        "kind": 6,
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "peekOfCode": "class SerializedPartSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = SerializedPart\n        include_fk = True\nserialized_part_schema = SerializedPartSchema()\nserialized_parts_schema = SerializedPartSchema(many=True)",
+        "detail": "app.blueprints.serialized_parts.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "serialized_part_schema",
+        "kind": 5,
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "peekOfCode": "serialized_part_schema = SerializedPartSchema()\nserialized_parts_schema = SerializedPartSchema(many=True)",
+        "detail": "app.blueprints.serialized_parts.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "serialized_parts_schema",
+        "kind": 5,
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "peekOfCode": "serialized_parts_schema = SerializedPartSchema(many=True)",
+        "detail": "app.blueprints.serialized_parts.schemas",
         "documentation": {}
     },
     {

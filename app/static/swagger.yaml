@@ -425,6 +425,101 @@ paths:
         200:
           description: "Part description deleted successfully"
 
+  #* Serialized Parts paths
+  /serialized-parts:
+    post:
+      tags:
+        - "Serialized Parts"
+      summary: "Create a new serialized part"
+      description: "Send JSON payload including part pescription details to create a new serialized part in database"
+      parameters:
+        - in: body
+          name: body
+          description: "Information of serialized part to be created"
+          required: true
+          schema: 
+            $ref: "#/definitions/SerializedPartPayload" 
+      responses:
+        201:
+          description: "Part Description created successfully"
+          schema:
+            $ref: "#/definitions/SerializedPartResponse" 
+          examples:  
+            application/json:
+              brand: "test brand"
+              desc_id: 1
+              id: 1
+              ticket_id: 1
+
+    get:
+      tags:
+          - "Serialized Parts"
+      summary: "Get all parts"
+      description: "Endpoint to return all serialized parts"
+      responses:
+        200:
+          description: "Successfully retrieved all serialized parts"
+          schema:
+            $ref: "#/definitions/SerializedPartListResponse"  
+
+  /serialized-parts/{serialized_part_id}:
+    get:
+      tags:
+        - "Serialized Parts"
+      summary: "Get a Part by ID"
+      parameters:
+        - in: path
+          name: serialized_part_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/SerializedPartResponse"
+
+    put:
+      tags:
+        - "Serialized Parts"
+      summary: "Update a part"
+      description: "Update an existing Parts information"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: serialized_part_id
+          type: integer
+          required: true
+          description: "ID of the Part to update"
+        - in: body
+          name: body
+          description: "Information used update a Part"
+          required: true
+          schema: 
+            $ref: "#/definitions/SerializedPartPayload" 
+      responses:
+        200:  
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/SerializedPartResponse"
+
+    delete:
+      tags: 
+        - "Serialized Parts"
+      summary: "Delete a Part"
+      description: "Delete a Part  from the database "
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: serialized_part_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Part deleted successfully"
+
+
     
               
 definitions:
@@ -589,3 +684,25 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/PartDescriptionResponse" 
+
+  #* Serialized Part definitions
+  SerializedPartPayload:
+    type: object
+    properties:
+      desc_id:
+        type: integer
+
+  SerializedPartResponse:
+    type: object
+    properties:
+      desc_id:
+        type: integer
+      id:
+        type: integer
+      ticket_id:
+        type: integer
+
+  SerializedPartListResponse:
+    type: array
+    items:
+      $ref: "#/definitions/SerializedPartResponse" 
