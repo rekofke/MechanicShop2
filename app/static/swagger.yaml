@@ -329,6 +329,103 @@ paths:
       responses:
         200:
           description: "Service ticket deleted successfully"
+
+#* part descriptions paths
+  /part-descriptions:
+    post:
+      tags:
+        - "Part Descriptions"
+      summary: "Create a new part description"
+      description: "Send JSON payload including part pescription details to create a new part description in database"
+      parameters:
+        - in: body
+          name: body
+          description: "Information of part description to be created"
+          required: true
+          schema: 
+            $ref: "#/definitions/PartDescriptionPayload" 
+      responses:
+        201:
+          description: "Part Description created successfully"
+          schema:
+            $ref: "#/definitions/PartDescriptioinResponse" 
+          examples:  
+            application/json:
+              brand: "test brand"
+              id: 1
+              part_name: "test part"
+              price: 100.00
+              serialized_parts: []
+
+    get:
+      tags:
+          - "Part Descriptions"
+      summary: "Get all parts"
+      description: "Endpoint to return all part descriptions"
+      responses:
+        200:
+          description: "Successfully retrieved all part descriptions"
+          schema:
+            $ref: "#/definitions/PartDescriptionListResponse"  
+
+  /part-descriptions/{part_description_id}:
+    get:
+      tags:
+        - "Part Descriptions"
+      summary: "Get a Part description by ID"
+      parameters:
+        - in: path
+          name: part_description_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/PartDescriptionResponse"
+
+    put:
+      tags:
+        - "Part Descriptions"
+      summary: "Update a part description"
+      description: "Update an existing Part description's information"
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: part_description_id
+          type: integer
+          required: true
+          description: "ID of the Part description to update"
+        - in: body
+          name: body
+          description: "Information used update a Part description"
+          required: true
+          schema: 
+            $ref: "#/definitions/PartDescriptionPayload" 
+      responses:
+        200:  
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/PartDescriptionResponse"
+
+    delete:
+      tags: 
+        - "Part Descriptions"
+      summary: "Delete a Part description"
+      description: "Delete a Part description from the database "
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: Part description_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: "Part description deleted successfully"
+
+    
               
 definitions:
   #* Mechanics definitions
@@ -458,3 +555,37 @@ definitions:
     type: array
     items:
       $ref: "#/definitions/ServiceTicketResponse" 
+
+  #* Part Description definitions
+  PartDescriptionPayload:
+    type: object
+    properties:
+      brand:
+        type: string
+      part_name:
+        type: string
+      price:
+        type: number
+        format: float
+
+  PartDescriptionResponse:
+    type: object
+    properties:
+      brand:
+        type: string
+      id:
+        type: integer
+      part_name:
+        type: string
+      price:
+        type: number
+        format: float
+      serialized_parts:
+        type: array
+        items:
+          type: integer
+
+  PartDescriptionListResponse:
+    type: array
+    items:
+      $ref: "#/definitions/PartDescriptionResponse" 
