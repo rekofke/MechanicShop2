@@ -312,14 +312,6 @@
         "documentation": {}
     },
     {
-        "label": "ServiceTicket",
-        "importPath": "app.models",
-        "description": "app.models",
-        "isExtraImport": true,
-        "detail": "app.models",
-        "documentation": {}
-    },
-    {
         "label": "Customer",
         "importPath": "app.models",
         "description": "app.models",
@@ -337,6 +329,22 @@
     },
     {
         "label": "Mechanic",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SerializedPart",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "ServiceTicket",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -590,6 +598,30 @@
         "description": "app.blueprints.mechanics.schemas",
         "isExtraImport": true,
         "detail": "app.blueprints.mechanics.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "serialized_part_schema",
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "isExtraImport": true,
+        "detail": "app.blueprints.serialized_parts.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "serialized_parts_schema",
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "isExtraImport": true,
+        "detail": "app.blueprints.serialized_parts.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "serialized_part_schema",
+        "importPath": "app.blueprints.serialized_parts.schemas",
+        "description": "app.blueprints.serialized_parts.schemas",
+        "isExtraImport": true,
+        "detail": "app.blueprints.serialized_parts.schemas",
         "documentation": {}
     },
     {
@@ -1069,7 +1101,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def create_ServiceTicket():\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    customer = db.session.get(Customer, service_ticket_data['customer_id'])\n    new_service_ticket = ServiceTicket(**service_ticket_data)\n    db.session.add(new_service_ticket)\n    db.session.commit()\n    return service_ticket_schema.jsonify(new_service_ticket), 201  # successfully created",
+        "peekOfCode": "def create_ServiceTicket():\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    customer = db.session.get(Customer, service_ticket_data[\"customer_id\"])\n    new_service_ticket = ServiceTicket(**service_ticket_data)\n    db.session.add(new_service_ticket)\n    db.session.commit()\n    return service_ticket_schema.jsonify(",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -1078,7 +1110,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_tickets():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(ServiceTicket)\n        service_tickets = db.paginate(query, page=page, per_page=per_page)\n        return service_tickets_schema.jsonify(service_tickets), 200\n    except:\n        query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()",
+        "peekOfCode": "def get_service_tickets():\n    try:\n        page = int(request.args.get(\"page\"))\n        per_page = int(request.args.get(\"per_page\"))\n        query = select(ServiceTicket)\n        service_tickets = db.paginate(query, page=page, per_page=per_page)\n        return service_tickets_schema.jsonify(service_tickets), 200\n    except:\n        query = select(ServiceTicket)\n    service_tickets = db.session.execute(query).scalars().all()",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -1087,7 +1119,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route('/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>', methods=['POST'])\n@limiter.limit(\"25/hour\")\n@admin_required\ndef add_mechanic(service_ticket_id, mechanic_id):",
+        "peekOfCode": "def get_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if service_ticket:\n        return service_ticket_schema.jsonify(service_ticket), 200\n    return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n# Add a mechanic to a service_ticket\n@service_tickets_bp.route(\"/<int:service_ticket_id>/add-mechanic/<int:mechanic_id>\", methods=[\"PUT\"])\n@limiter.limit(\"25/hour\")\n@admin_required\ndef add_mechanic(service_ticket_id, mechanic_id):",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -1096,7 +1128,16 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if ticket and mechanic:\n        if mechanic not in ticket.mechanics:\n            ticket.mechanics.append(mechanic)\n            db.session.commit()\n            return jsonify({\n                'message': f'Successfully added mechanic {mechanic.name} to service ticket {service_ticket_id}',\n                'ticket': service_ticket_schema.dump(ticket),",
+        "peekOfCode": "def add_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if ticket and mechanic:\n        if mechanic not in ticket.mechanics:\n            ticket.mechanics.append(mechanic)\n            db.session.commit()\n            return jsonify(\n                {\n                    \"message\": f\"Successfully added mechanic {mechanic.name} to service ticket {service_ticket_id}\",",
+        "detail": "app.blueprints.service_tickets.routes",
+        "documentation": {}
+    },
+    {
+        "label": "remove_mechanic",
+        "kind": 2,
+        "importPath": "app.blueprints.service_tickets.routes",
+        "description": "app.blueprints.service_tickets.routes",
+        "peekOfCode": "def remove_mechanic(service_ticket_id, mechanic_id):\n    ticket = db.session.get(ServiceTicket, service_ticket_id)\n    mechanic = db.session.get(Mechanic, mechanic_id)\n    if ticket and mechanic:\n        if mechanic in ticket.mechanics:\n            ticket.mechanics.remove(mechanic)\n            db.session.commit()\n            return jsonify(\n                {\n                    \"message\": f\"successfully removed {mechanic.name} from the ticket\",",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -1105,7 +1146,7 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def update_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if not service_ticket:\n        return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(ServiceTicket).where(\n        (ServiceTicket.VIN == service_ticket_data[\"VIN\"]) &",
+        "peekOfCode": "def update_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if not service_ticket:\n        return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n    try:\n        service_ticket_data = service_ticket_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    query = select(ServiceTicket).where(\n        (ServiceTicket.VIN == service_ticket_data[\"VIN\"])",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },
@@ -1114,7 +1155,25 @@
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
         "description": "app.blueprints.service_tickets.routes",
-        "peekOfCode": "def delete_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if not service_ticket:\n        return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n    db.session.delete(service_ticket)\n    db.session.commit()\n    return jsonify({\"message\": \"service_ticket deleted successfully\"}), 200",
+        "peekOfCode": "def delete_service_ticket(service_ticket_id):\n    service_ticket = db.session.get(ServiceTicket, service_ticket_id)\n    if not service_ticket:\n        return jsonify({\"error\": \"Invalid service_ticket ID\"}), 400\n    db.session.delete(service_ticket)\n    db.session.commit()\n    return jsonify({\"message\": \"service_ticket deleted successfully\"}), 200\n# Add a part to a service_ticket\n@service_tickets_bp.route(\"/<int:ticket_id>/add-part/<int:part_id>\", methods=[\"PUT\"])\ndef add_part(ticket_id, part_id):",
+        "detail": "app.blueprints.service_tickets.routes",
+        "documentation": {}
+    },
+    {
+        "label": "add_part",
+        "kind": 2,
+        "importPath": "app.blueprints.service_tickets.routes",
+        "description": "app.blueprints.service_tickets.routes",
+        "peekOfCode": "def add_part(ticket_id, part_id):\n    ticket = db.session.get(ServiceTicket, ticket_id)\n    part = db.session.get(SerializedPart, part_id)\n    if ticket and part:\n        if not part.ticket_id:\n            ticket.serialized_parts.append(part)\n            db.session.commit()\n            return jsonify(\n                {\n                    \"message\": f\"successfully added part to the ticket\",",
+        "detail": "app.blueprints.service_tickets.routes",
+        "documentation": {}
+    },
+    {
+        "label": "remove_part",
+        "kind": 2,
+        "importPath": "app.blueprints.service_tickets.routes",
+        "description": "app.blueprints.service_tickets.routes",
+        "peekOfCode": "def remove_part(ticket_id, part_id):\n    ticket = db.session.get(ServiceTicket, ticket_id)\n    part = db.session.get(SerializedPart, part_id)\n    if ticket and part:\n        if not part.ticket_id:\n            ticket.serialized_parts.remove(part)\n            db.session.commit()\n            return jsonify(\n                {\n                    \"message\": f\"successfully removed part from the ticket\",",
         "detail": "app.blueprints.service_tickets.routes",
         "documentation": {}
     },

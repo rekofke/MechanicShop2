@@ -330,6 +330,94 @@ paths:
         200:
           description: "Service ticket deleted successfully"
 
+  /service-tickets/{ticket_id}/add-part/(part_id):
+    put:
+      tags:
+        - "Service Tickets - Parts"
+      summary: "Add a serialized part to a service ticket"
+      description: "Update an existing service ticket to add a serialized part"
+      security: 
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  
+          required: true
+          description: "ID of the service ticket to update"
+        - in: path
+          name: serialized_part_id
+          required: true
+          description: "ID of the serialized part to add" 
+      responses:
+        200: 
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+
+  /service-tickets/{ticket_id}/remove-part/(part_id):
+    delete:
+      tags:
+        - "Service Tickets - Parts"
+      summary: "Delete a serialized part from a service ticket"
+      description: "Update an existing service ticket to add a serialized part"
+      security: 
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  
+          required: true
+          description: "ID of the service ticket to deleted"
+        - in: path
+          name: serialized_part_id
+          required: true
+          description: "ID of the serialized part to delete" 
+      responses:
+        200: 
+          description: "Successfully deleted serialized part"
+
+  /service-tickets/{tiket_id}/add-mechanic/(mechanic_id):
+    put:
+      tags:
+        - "Service Tickets - Mechanics"
+      summary: "Add a mechanic to a service ticket"
+      description: "Update an existing service ticket to add a mechanic"
+      security: 
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  
+          required: true
+          description: "ID of the service ticket to update"
+        - in: path
+          name: mechanic
+          required: true
+          description: "ID of the mechanic to add" 
+      responses:
+        200: 
+          description: "Successful Update"
+          schema:
+            $ref: "#/definitions/ServiceTicketResponse"
+
+    delete:
+      tags:
+        - "Service Tickets - Mechanics"
+      summary: "Delete a mechanic from a service ticket"
+      description: "Update an existing service ticket to add a mechanic"
+      security: 
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: service_ticket_id  
+          required: true
+          description: "ID of the service ticket to deleted"
+        - in: path
+          name: serialized_part_id
+          required: true
+          description: "ID of the mechanic part to delete" 
+      responses:
+        200: 
+          description: "Successfully deleted serialized part"
+    
+
 #* part descriptions paths
   /part-descriptions:
     post:
@@ -424,6 +512,7 @@ paths:
       responses:
         200:
           description: "Part description deleted successfully"
+          
 
   #* Serialized Parts paths
   /serialized-parts:
@@ -517,10 +606,7 @@ paths:
           required: true
       responses:
         200:
-          description: "Part deleted successfully"
-
-
-    
+          description: "Part deleted successfully"   
               
 definitions:
   #* Mechanics definitions
