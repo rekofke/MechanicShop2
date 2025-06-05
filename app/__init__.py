@@ -5,6 +5,7 @@ from app.blueprints.customers import customers_bp
 from app.blueprints.mechanics import mechanics_bp
 from app.blueprints.service_tickets import service_tickets_bp
 from flask_swagger_ui import get_swaggerui_blueprint
+from app.blueprints.part_descriptions import part_descriptions_bp
 
 SWAGGER_URL = '/api/docs' # sets endpoint for docs
 API_URL = '/static/swagger.yaml' # grabs the host url from swagger file
@@ -36,5 +37,6 @@ def create_app(config_name):
     app.register_blueprint(mechanics_bp, url_prefix='/mechanics')
     app.register_blueprint(service_tickets_bp, url_prefix='/service-tickets')
     app.register_blueprint(swagger_bp, url_prefix=SWAGGER_URL)
+    app.register_blueprint(part_descriptions_bp, url_prefix='/part-descriptions')
 
     return app

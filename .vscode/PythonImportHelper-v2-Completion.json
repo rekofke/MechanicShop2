@@ -72,6 +72,30 @@
         "documentation": {}
     },
     {
+        "label": "Flask",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "request",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
+        "label": "jsonify",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "request",
         "importPath": "flask",
         "description": "flask",
@@ -112,6 +136,22 @@
         "documentation": {}
     },
     {
+        "label": "select",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "ValidationError",
+        "importPath": "marshmallow",
+        "description": "marshmallow",
+        "isExtraImport": true,
+        "detail": "marshmallow",
+        "documentation": {}
+    },
+    {
         "label": "ValidationError",
         "importPath": "marshmallow",
         "description": "marshmallow",
@@ -177,6 +217,30 @@
     },
     {
         "label": "Mechanic",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "db",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PartDescription",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PartDescription",
         "importPath": "app.models",
         "description": "app.models",
         "isExtraImport": true,
@@ -229,6 +293,30 @@
         "description": "app.models",
         "isExtraImport": true,
         "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "limiter",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "cache",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
+        "documentation": {}
+    },
+    {
+        "label": "ma",
+        "importPath": "app.extensions",
+        "description": "app.extensions",
+        "isExtraImport": true,
+        "detail": "app.extensions",
         "documentation": {}
     },
     {
@@ -718,6 +806,96 @@
         "documentation": {}
     },
     {
+        "label": "create_part_description",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def create_part_description():\n    try:\n        part_description_data = part_description_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    new_part_description = PartDescription(**part_description_data)\n    db.session.add(new_part_description)\n    db.session.commit()\n    return part_description_schema.jsonify(new_part_description), 201  # successfully created\n# Get all part_descriptions",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_part_descriptions",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def get_part_descriptions():\n    try:\n        page = int(request.args.get('page'))\n        per_page = int(request.args.get('per_page'))\n        query = select(PartDescription)\n        part_descriptions = db.paginate(query, page=page, per_page=per_page)\n        return part_descriptions_schema.jsonify(part_descriptions), 200\n    except:\n        query = select(PartDescription)\n    part_descriptions = db.session.execute(query).scalars().all()",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_part_description",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def get_part_description(part_description_id):\n    part_description = db.session.get(PartDescription, part_description_id)\n    if part_description:\n        return part_description_schema.jsonify(part_description), 200\n    return jsonify({\"error\": \"Invalid part_description ID\"}), 400\n# Update a part_description\n@part_descriptions_bp.route('/<int:part_description_id>', methods=['PUT'])\n@limiter.limit(\"5/hour\")\ndef update_part_description(part_description_id):\n    part_description = db.session.get(PartDescription, part_description_id)",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "update_part_description",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def update_part_description(part_description_id):\n    part_description = db.session.get(PartDescription, part_description_id)\n    if not part_description:\n        return jsonify({\"error\": \"Invalid part_description ID\"}), 400\n    try:\n        part_description_data = part_description_schema.load(request.json)\n    except ValidationError as e:\n        return jsonify(e.messages), 400\n    for fields, value in part_description_data.items():\n        setattr(part_description, fields, value)",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "delete_part_description",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def delete_part_description(part_description_id):\n    part_description = db.session.get(PartDescription, part_description_id)\n    if not part_description:\n        return jsonify({\"error\": \"Invalid part_description ID\"}), 400\n    db.session.delete(part_description)\n    db.session.commit()\n    return jsonify({\"message\": \"part_description deleted successfully\"}), 200\n# Path query to find most valuable part_description\n@part_descriptions_bp.route('/most-valuable', methods=['GET'])\ndef get_most_valuable():",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "get_most_valuable",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def get_most_valuable():\n    # return list of part_descriptions with the most service tickets\n    query = select(PartDescription)\n    part_descriptions = db.session.execute(query).scalars().all()\n    part_descriptions.sort(key=lambda part_description: len(part_description.tickets),reverse=True)\n    return part_descriptions_schema.jsonify(part_descriptions), 200  \n# Query parameter to search part_description by email\n@part_descriptions_bp.route('/search', methods=['GET'])\ndef search_by_part_name():\n    name = request.args.get('name')",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "search_by_part_name",
+        "kind": 2,
+        "importPath": "app.blueprints.part_descriptions.routes",
+        "description": "app.blueprints.part_descriptions.routes",
+        "peekOfCode": "def search_by_part_name():\n    name = request.args.get('name')\n    #* search for exact email\n    # query = select(part_description).where(part_description.email == email)\n    #* search for part of email\n    query = select(part_description).where(part_description.part_name.like(f\"%{name}%\"))\n    part_description = db.session.execute(query).scalars().first()\n    return part_description_schema.jsonify(part_description), 200",
+        "detail": "app.blueprints.part_descriptions.routes",
+        "documentation": {}
+    },
+    {
+        "label": "PartDescriptionSchema",
+        "kind": 6,
+        "importPath": "app.blueprints.part_descriptions.schemas",
+        "description": "app.blueprints.part_descriptions.schemas",
+        "peekOfCode": "class PartDescriptionSchema(ma.SQLAlchemyAutoSchema):\n    class Meta:\n        model = PartDescription\n        include_relationships = True\npart_description_schema = PartDescriptionSchema()\npart_descriptions_schema = PartDescriptionSchema(many=True)",
+        "detail": "app.blueprints.part_descriptions.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "part_description_schema",
+        "kind": 5,
+        "importPath": "app.blueprints.part_descriptions.schemas",
+        "description": "app.blueprints.part_descriptions.schemas",
+        "peekOfCode": "part_description_schema = PartDescriptionSchema()\npart_descriptions_schema = PartDescriptionSchema(many=True)",
+        "detail": "app.blueprints.part_descriptions.schemas",
+        "documentation": {}
+    },
+    {
+        "label": "part_descriptions_schema",
+        "kind": 5,
+        "importPath": "app.blueprints.part_descriptions.schemas",
+        "description": "app.blueprints.part_descriptions.schemas",
+        "peekOfCode": "part_descriptions_schema = PartDescriptionSchema(many=True)",
+        "detail": "app.blueprints.part_descriptions.schemas",
+        "documentation": {}
+    },
+    {
         "label": "create_ServiceTicket",
         "kind": 2,
         "importPath": "app.blueprints.service_tickets.routes",
@@ -893,7 +1071,25 @@
         "kind": 6,
         "importPath": "app.models",
         "description": "app.models",
-        "peekOfCode": "class ServiceTicket(Base):\n    __tablename__ = \"service_tickets\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    service_date: Mapped[date]\n    VIN: Mapped[str] = mapped_column(db.String(17), nullable=False)\n    service_desc: Mapped[str] = mapped_column(db.String(500), nullable=False)\n    customer_id: Mapped[int] = mapped_column(db.ForeignKey(\"customers.id\"), nullable=False)\n    customer: Mapped[\"Customer\"] = db.relationship(back_populates=\"tickets\")\n    mechanics: Mapped[List[\"Mechanic\"]] = db.relationship(secondary=service_mechanic, back_populates=\"tickets\")",
+        "peekOfCode": "class ServiceTicket(Base):\n    __tablename__ = \"service_tickets\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    service_date: Mapped[date]\n    VIN: Mapped[str] = mapped_column(db.String(17), nullable=False)\n    service_desc: Mapped[str] = mapped_column(db.String(500), nullable=False)\n    customer_id: Mapped[int] = mapped_column(db.ForeignKey(\"customers.id\"), nullable=False)\n    customer: Mapped[\"Customer\"] = db.relationship(back_populates=\"tickets\")\n    mechanics: Mapped[List[\"Mechanic\"]] = db.relationship(secondary=service_mechanic, back_populates=\"tickets\")\n    serialized_parts: Mapped[List[\"SerializedPart\"]] = db.relationship(back_populates=\"ticket\")",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "PartDescription",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class PartDescription(Base):\n    __tablename__ = \"part_descriptions\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    part_name: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    brand: Mapped[str] = mapped_column(db.String(255), nullable=False)\n    price: Mapped[float] = mapped_column(db.Float(), nullable=False)\n    serialized_parts: Mapped[List[\"SerializedPart\"]] = db.relationship(back_populates=\"description\")\nclass SerializedPart(Base):\n    __tablename__ = \"serialized_parts\"\n    id: Mapped[int] = mapped_column(primary_key=True)",
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "SerializedPart",
+        "kind": 6,
+        "importPath": "app.models",
+        "description": "app.models",
+        "peekOfCode": "class SerializedPart(Base):\n    __tablename__ = \"serialized_parts\"\n    id: Mapped[int] = mapped_column(primary_key=True)\n    desc_id: Mapped[int] = mapped_column(db.ForeignKey(\"part_descriptions.id\"), nullable=False)\n    ticket_id: Mapped[int] = mapped_column(db.ForeignKey(\"service_tickets.id\"), nullable=True)\n    description: Mapped[\"PartDescription\"] = db.relationship(back_populates=\"serialized_parts\")\n    ticket: Mapped[\"ServiceTicket\"] = db.relationship(back_populates=\"serialized_parts\")",
         "detail": "app.models",
         "documentation": {}
     },
