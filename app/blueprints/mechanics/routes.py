@@ -30,7 +30,7 @@ def login_mechanic():
             "message": "Successfully logged in",
             "token": token,
             "user": mechanic_schema.dump(mechanic)
-        })
+        }), 200
     
     return jsonify({"error": "Invalid email or password"}), 401
 

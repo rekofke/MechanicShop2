@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
 from sqlalchemy import select
 from marshmallow import ValidationError
-from app.models import db, SerializedPart
+from app.models import PartDescription, db, SerializedPart
+from app.blueprints.part_descriptions import part_descriptions_bp
 from .schemas import serialized_part_schema, serialized_parts_schema  
 from . import serialized_parts_bp
 from app.extensions import limiter, cache
@@ -25,7 +26,7 @@ def create_serialized_part():
     return jsonify({
         "message": f"Added new {new_serialized_part.description.brand} {new_serialized_part.description.part_name} to database",
         "part": serialized_part_schema.dump(new_serialized_part)
-    })
+    }), 201
 
 
 # Get all serialized_parts
@@ -103,6 +104,25 @@ def get_most_valuable():
     serialized_parts.sort(key=lambda serialized_part: len(serialized_part.tickets),reverse=True)
 
     return serialized_parts_schema.jsonify(serialized_parts), 200  
+
+# Find on hand amount of part by description ID
+@serialized_parts_bp.route("/stock/<int:description_id>", methods=["GET"])
+def get_individual_stock(description_id):
+    part_description = db.session.get(PartDescription, description_id)
+
+    parts = part_description.serialized_parts
+
+    count = 0
+    for part in parts:
+        if not part.ticket_id:
+            count += 1
+
+    return jsonify(
+        {"item": part_description.part_name,
+        "quantity": count
+
+    }
+    )
 
 
 

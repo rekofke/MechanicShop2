@@ -4,7 +4,7 @@ from sqlalchemy import select
 from marshmallow import ValidationError
 from .schemas import service_ticket_schema, service_tickets_schema
 from . import service_tickets_bp
-from app.models import Customer, db, Mechanic, SerializedPart, ServiceTicket
+from app.models import Customer, db, Mechanic, PartDescription, SerializedPart, ServiceTicket
 from app.blueprints.mechanics.schemas import mechanic_schema, mechanics_schema
 from app.blueprints.serialized_parts.schemas import (
     serialized_part_schema,
@@ -210,3 +210,23 @@ def remove_part(ticket_id, part_id):
             ), 200
         return jsonify({"error": "Part not assigned to this service ticket"}), 400
     return jsonify({"error": "Invalid service ticket or part ID"}), 400
+
+@service_tickets_bp.route("/<int:ticket_id>/add-to-cart/<int:description_id>", methods=["PUT"])
+def add_to_cart(ticket_id, description_id):
+    ticket = db.session.get(ServiceTicket, ticket_id)
+    description = db.session.get(PartDescription, description)
+
+    parts = description.serialized_parts
+
+    for part in parts:
+        if not part.ticket_id:
+            ticket.serializd_parts.append(part)
+            return jsonify(
+                {
+                    "message": f"successfully added part to the ticket",
+                    "ticket": service_ticket_schema.dump(ticket),
+                    "parts": serialized_parts_schema.dump(ticket.serialized_parts),
+                }
+            ), 200
+        
+
