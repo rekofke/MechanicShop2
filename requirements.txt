@@ -29,6 +29,7 @@ mysql-connector==2.2.9
 mysql-connector-python==9.3.0
 ordered-set==4.1.0
 packaging==25.0
+psycopg2==2.9.10
 pyasn1==0.6.1
 pycparser==2.22
 Pygments==2.19.1

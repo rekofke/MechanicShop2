@@ -528,6 +528,14 @@
         "documentation": {}
     },
     {
+        "label": "db",
+        "importPath": "app.models",
+        "description": "app.models",
+        "isExtraImport": true,
+        "detail": "app.models",
+        "documentation": {}
+    },
+    {
         "label": "limiter",
         "importPath": "app.extensions",
         "description": "app.extensions",
@@ -921,6 +929,15 @@
         "documentation": {}
     },
     {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
         "label": "Marshmallow",
         "importPath": "flask_marshmallow",
         "description": "flask_marshmallow",
@@ -1050,12 +1067,11 @@
         "documentation": {}
     },
     {
-        "label": "os",
-        "kind": 6,
+        "label": "create_app",
+        "importPath": "app",
+        "description": "app",
         "isExtraImport": true,
-        "importPath": "os",
-        "description": "os",
-        "detail": "os",
+        "detail": "app",
         "documentation": {}
     },
     {
@@ -1567,7 +1583,7 @@
         "kind": 5,
         "importPath": "app.util.auth",
         "description": "app.util.auth",
-        "peekOfCode": "SECRET_KEY = \"super secret secrets\"\ndef encode_token(user_id, role='user'):\n    payload = {\n        'exp': datetime.now(timezone.utc) + timedelta(days=1), # expiration time set to 1 day\n        'iat': datetime.now(timezone.utc), # issuad at time\n        'sub': str(user_id), #* user_id must be string in order to decode properly\n        'role': role  #* role can be 'user' or 'mechanic'\n    }\n    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')\n    return token",
+        "peekOfCode": "SECRET_KEY = os.environ.get('SECRET_KEY') or \"super secret secrets\"\ndef encode_token(user_id, role='user'):\n    payload = {\n        'exp': datetime.now(timezone.utc) + timedelta(days=1), # expiration time set to 1 day\n        'iat': datetime.now(timezone.utc), # issuad at time\n        'sub': str(user_id), #* user_id must be string in order to decode properly\n        'role': role  #* role can be 'user' or 'mechanic'\n    }\n    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')\n    return token",
         "detail": "app.util.auth",
         "documentation": {}
     },
@@ -1738,7 +1754,7 @@
         "kind": 6,
         "importPath": "config",
         "description": "config",
-        "peekOfCode": "class TestingConfig:\n   SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'\n   debug = True \n   CACHE_TYPE = 'SimpleCache'\nclass ProductionConfig:\n    pass",
+        "peekOfCode": "class TestingConfig:\n   SQLALCHEMY_DATABASE_URI = 'sqlite:///testing.db'\n   debug = True \n   CACHE_TYPE = 'SimpleCache'\nclass ProductionConfig:\n    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///mechanic_shop.db'\n    CACHE_TYPE = 'SimpleCache'",
         "detail": "config",
         "documentation": {}
     },
@@ -1747,8 +1763,17 @@
         "kind": 6,
         "importPath": "config",
         "description": "config",
-        "peekOfCode": "class ProductionConfig:\n    pass",
+        "peekOfCode": "class ProductionConfig:\n    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///mechanic_shop.db'\n    CACHE_TYPE = 'SimpleCache'",
         "detail": "config",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "run",
+        "description": "run",
+        "peekOfCode": "app = create_app('ProductionConfig')\nwith app.app_context():\n    # db.drop_all()\n    db.create_all()",
+        "detail": "run",
         "documentation": {}
     }
 ]

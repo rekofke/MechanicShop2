@@ -13,4 +13,6 @@ class TestingConfig:
    CACHE_TYPE = 'SimpleCache'
 
 class ProductionConfig:
-    pass
+    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI') or 'sqlite:///mechanic_shop.db'
+    CACHE_TYPE = 'SimpleCache'
+
