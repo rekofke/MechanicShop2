@@ -136,6 +136,14 @@
         "documentation": {}
     },
     {
+        "label": "redirect",
+        "importPath": "flask",
+        "description": "flask",
+        "isExtraImport": true,
+        "detail": "flask",
+        "documentation": {}
+    },
+    {
         "label": "select",
         "importPath": "sqlalchemy",
         "description": "sqlalchemy",
@@ -1768,11 +1776,20 @@
         "documentation": {}
     },
     {
+        "label": "index",
+        "kind": 2,
+        "importPath": "run",
+        "description": "run",
+        "peekOfCode": "def index():\n    return redirect('/api/docs')\nwith app.app_context():\n    # db.drop_all()\n    db.create_all()",
+        "detail": "run",
+        "documentation": {}
+    },
+    {
         "label": "app",
         "kind": 5,
         "importPath": "run",
         "description": "run",
-        "peekOfCode": "app = create_app('ProductionConfig')\nwith app.app_context():\n    # db.drop_all()\n    db.create_all()",
+        "peekOfCode": "app = create_app('ProductionConfig')\n@app.route('/', methods=['GET'])\ndef index():\n    return redirect('/api/docs')\nwith app.app_context():\n    # db.drop_all()\n    db.create_all()",
         "detail": "run",
         "documentation": {}
     }
