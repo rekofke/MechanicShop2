@@ -2,7 +2,7 @@ name: Flask CI/CD
 
 on:
   push:
-  branches: [main]
+    branches: [main]
 
 jobs:
   
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12'
+          python-version: 3.12
 
       - name: Create virtual environment
         run: |
@@ -32,13 +32,11 @@ jobs:
         run: |
           echo "python version: $(python --version)"
           echo "working directory: $(pwd)"
-          echo "contents of working directory: $(ls -la)"
-          echo "contents of site-packages: $(ls -la venv/lib/python*/site-packages)"
+          echo "contents of working directory: $(ls -l)"
+          echo "contents of site-packages: $(ls -l venv/lib/python*/site-packages)"
 
   test:
     needs: build
-    runs-on: ubuntu-latest
-
     runs-on: ubuntu-latest
 
     steps:
@@ -48,7 +46,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.12'
+          python-version: 3.12
 
       - name: Create virtual environment
         run: |
