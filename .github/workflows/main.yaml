@@ -17,6 +17,9 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Install Python venv module
+        run: sudo apt-get install python3.12-venv -y
+
       - name: Create virtual environment
         run: |
           python -m venv venv
@@ -26,6 +29,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+
 
       - name: Print debugging Info
         run: |
