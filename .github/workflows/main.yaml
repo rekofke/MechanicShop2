@@ -22,7 +22,8 @@ jobs:
 
       - name: Create virtual environment
         run: |
-          python3.12 -m venv venv  # Use explicit python version
+          python3.12 -m venv venv || { echo "Failed to create venv"; exit 1; }
+          ls -l venv || { echo "venv directory does not exist"; exit 1; }
           source venv/bin/activate
 
       - name: Install dependencies
