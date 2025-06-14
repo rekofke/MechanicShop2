@@ -17,10 +17,11 @@ jobs:
         uses: actions/setup-python@v5.6.0
         with:
           python-version: 3.13
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
+
+      # - name: Create virtual environment
+      #   run: |
+      #     python -m venv venv
+      #     source venv/bin/activate
 
       - name: Install dependencies
         run: |
