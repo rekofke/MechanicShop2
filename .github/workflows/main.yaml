@@ -48,10 +48,10 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
+      # - name: Create virtual environment
+      #   run: |
+      #     python -m venv venv
+      #     source venv/bin/activate
 
       - name: Install dependencies
         run: |
@@ -74,10 +74,10 @@ jobs:
         with:
           python-version: 3.12
 
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
+      # - name: Create virtual environment
+      #   run: |
+      #     python -m venv venv
+      #     source venv/bin/activate
 
       - name: Install dependencies
         run: |
