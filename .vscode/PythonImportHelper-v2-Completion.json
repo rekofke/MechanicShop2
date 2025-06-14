@@ -1018,6 +1018,24 @@
         "documentation": {}
     },
     {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
         "label": "unittest",
         "kind": 6,
         "isExtraImport": true,
@@ -1692,6 +1710,33 @@
         "description": "app.models",
         "peekOfCode": "service_mechanic = db.Table(\n    \"service_mechanic\",\n    Base.metadata,\n    db.Column(\"ticket_id\", db.ForeignKey(\"service_tickets.id\")),\n    db.Column(\"mechanic_id\", db.ForeignKey(\"mechanics.id\")),\n)\n# * ---------- Models ----------\nclass Customer(Base):\n    __tablename__ = \"customers\"\n    id: Mapped[int] = mapped_column(primary_key=True)",
         "detail": "app.models",
+        "documentation": {}
+    },
+    {
+        "label": "a",
+        "kind": 5,
+        "importPath": "setup-python.__tests__.test-pipenv",
+        "description": "setup-python.__tests__.test-pipenv",
+        "peekOfCode": "a = np.array([2, 3, 4])\nprint(type(a))\nb = np.array([1.2, 3.5, 5.1])\nprint(type(b))",
+        "detail": "setup-python.__tests__.test-pipenv",
+        "documentation": {}
+    },
+    {
+        "label": "b",
+        "kind": 5,
+        "importPath": "setup-python.__tests__.test-pipenv",
+        "description": "setup-python.__tests__.test-pipenv",
+        "peekOfCode": "b = np.array([1.2, 3.5, 5.1])\nprint(type(b))",
+        "detail": "setup-python.__tests__.test-pipenv",
+        "documentation": {}
+    },
+    {
+        "label": "argCount",
+        "kind": 5,
+        "importPath": "setup-python.__tests__.verify-python",
+        "description": "setup-python.__tests__.verify-python",
+        "peekOfCode": "argCount = len(sys.argv) - 1\nif argCount == 1:\n    expectedVersion = sys.argv[1]\n    versions = len(expectedVersion.split(\".\"))\n    majorMinor = str(sys.version_info[0]) + '.' + str(sys.version_info[1])\n    if versions == 2:\n        # Test only major and minor version\n        if expectedVersion != majorMinor:\n            raise Exception(\"Incorrect major + minor version detected\\nExpected: \" + expectedVersion + \"\\nActual: \" + majorMinor)\n    elif versions == 3:",
+        "detail": "setup-python.__tests__.verify-python",
         "documentation": {}
     },
     {
